@@ -11,6 +11,7 @@
     C/C++ includes
 */
 #include <stdio.h>
+#include <conio.h>
 
 /*
     Platfrom includes
@@ -58,8 +59,8 @@ void platform::ClearScreen()
     SetConsoleCursorPosition(hStdOut, homeCoords);
 }
 
-void platform::FlushInputBuffer()
+void platform::FlushStdIn()
 {
-    int row = 0;
-    while ((row = getchar()) != '\n' && row != EOF);
+    int c = 0;
+    while ((c = getchar()) != '\n' && c != EOF) {}
 }

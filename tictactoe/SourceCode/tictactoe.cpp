@@ -99,13 +99,18 @@ extern "C" __declspec(dllexport) const char *GameName(void)
 extern "C" __declspec(dllexport) void StarGame(minigames::platform_t *platform)
 {
     const char boardFormat[] =
-        "     |  1  |  2  |  3  \n"
-        "-----+-----+-----+-----\n"
-        "  1  |  V  |  V  |  V  \n"
-        "-----+-----+-----+-----\n"
-        "  2  |  V  |  V  |  V  \n"
-        "-----+-----+-----+-----\n"
-        "  3  |  V  |  V  |  V  \n";
+        "\n"
+        "   One of the player uses the 'O' and the other one the 'X'.\n"
+        "   The winner is the one who can make a full line horizontal,\n"
+        "   vertical or in diagonal of its character\n\n"
+        "        |  1  |  2  |  3  \n"
+        "   -----+-----+-----+-----\n"
+        "     1  |  V  |  V  |  V  \n"
+        "   -----+-----+-----+-----\n"
+        "     2  |  V  |  V  |  V  \n"
+        "   -----+-----+-----+-----\n"
+        "     3  |  V  |  V  |  V  \n"
+        "\n";
 
     char matrix[3][3] =
     {
@@ -114,7 +119,6 @@ extern "C" __declspec(dllexport) void StarGame(minigames::platform_t *platform)
         { ' ', ' ', ' ' }
     };
 
-    platform->FlushStdIn();
     platform->ClearScreen();
     constexpr size_t boarBufferSize = sizeof(boardFormat) + 1;
 
@@ -122,43 +126,42 @@ extern "C" __declspec(dllexport) void StarGame(minigames::platform_t *platform)
     int row = 0, col = 0;
 
     char playerChars[2] = { 'O', 'X' };
-    int whichCar = 0; char winner = ' ';
+    int whichChar = 0; char winner = ' ';
 
     while (true)
     {
         fnc_fill_board(boardFormat, matrix, boardBuffer, boarBufferSize);
         printf("%s", boardBuffer);
 
-        printf("Select row and cold [player %c] (row,col): ", playerChars[whichCar]);
+        if (fnc_check_win(matrix, winner) || fnc_is_board_full(matrix))
+        {
+            break;
+        }
+
+        printf("    Select row and cold [player '%c'] (row,col): ", playerChars[whichChar]);
         scanf_s("%d,%d", &row, &col);
 
         if (row >= 1 && row <= 3 && col >= 1 && col <= 3)
         {
             if (matrix[row - 1][col - 1] == ' ')
             {
-                matrix[row - 1][col - 1] = playerChars[whichCar];
-                whichCar = (whichCar + 1) % sizeof(playerChars);
+                matrix[row - 1][col - 1] = playerChars[whichChar];
+                whichChar = (whichChar + 1) % sizeof(playerChars);
             }
         }
 
-        if (fnc_check_win(matrix, winner) || fnc_is_board_full(matrix))
-        {
-            break;
-        }
-
         platform->ClearScreen();
-        platform->FlushStdIn();
+        while ((row = getchar()) != '\n' && row != EOF) {}
     }
 
     if (winner != ' ')
     {
-        printf("\r The winnner is: %c!", winner);
+        printf("\n    The winnner is: %c!", winner);
     }
     else
     {
-        printf("No winner : (");
+        printf("\n    No winner    : (");
     }
 
-    platform->FlushStdIn();
-    getchar();
+    while ((row = getchar()) != '\n' && row != EOF) {}
 }

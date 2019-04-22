@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 
     minigames::platform_t platformFunctions = { 0 };
     platformFunctions.ClearScreen = &platform::ClearScreen;
-    platformFunctions.FlushStdIn = &platform::FlushInputBuffer;
+    platformFunctions.FlushStdIn = &platform::FlushStdIn;
 
     const char *menuHeader =
         "\n"
@@ -127,13 +127,17 @@ int main(int argc, char *argv[])
         {
             break;
         }
-        else if (userMenuOption > 0 && userMenuOption <= games.size())
+        else if (userMenuOption < 0)
+        {
+            // NOTE(Andrei): Nothing to do, invalid input
+        }
+        else if (userMenuOption <= games.size())
         {
             games[userMenuOption - 1]->startGame(&platformFunctions);
         }
 
         platform::ClearScreen();
-        platform::FlushInputBuffer();
+        platform::FlushStdIn();
     }
 
     return 0;

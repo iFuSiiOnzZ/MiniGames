@@ -3,5 +3,5 @@
 namespace platform
 {
     void ClearScreen();
-    void FlushInputBuffer();
+    void FlushStdIn();
 }
