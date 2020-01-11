@@ -6,5 +6,8 @@ namespace minigames
     {
         void(*ClearScreen)(void);
         void(*FlushStdIn)(void);
+
+        bool(*WasKeyDown)(int key);
+        bool(*IsKeyDown)(int key);
     } platform_t;
 }

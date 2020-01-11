@@ -98,11 +98,14 @@ std::vector<std::shared_ptr<Game>> fnc_load_game(const std::vector<std::string> 
 int main(int argc, char *argv[])
 {
     std::vector<std::shared_ptr<Game>> games(fnc_load_game(fnc_get_all_dll("./")));
+    minigames::platform_t platformFunctions = { 0 };
     int userMenuOption = 0;
 
-    minigames::platform_t platformFunctions = { 0 };
     platformFunctions.ClearScreen = &platform::ClearScreen;
     platformFunctions.FlushStdIn = &platform::FlushStdIn;
+
+    platformFunctions.WasKeyDown = &platform::WasKeyDown;
+    platformFunctions.IsKeyDown = &platform::IsKeyDown;
 
     const char *menuHeader =
         "\n"

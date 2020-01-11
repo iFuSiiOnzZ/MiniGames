@@ -64,3 +64,14 @@ void platform::FlushStdIn()
     int c = 0;
     while ((c = getchar()) != '\n' && c != EOF) {}
 }
+
+bool platform::IsKeyDown(int key)
+{
+    return (GetAsyncKeyState(key) & 0x8000) == 0x8000;
+}
+
+bool platform::WasKeyDown(int key)
+{
+    return (GetAsyncKeyState(key) & 0x0001) == 0x0001;
+}
+
