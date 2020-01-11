@@ -146,7 +146,7 @@ extern "C" __declspec(dllexport) void StarGame(minigames::platform_t *platform)
             if (matrix[row - 1][col - 1] == ' ')
             {
                 matrix[row - 1][col - 1] = playerChars[whichChar];
-                whichChar = (whichChar + 1) % sizeof(playerChars);
+                whichChar = (whichChar + 1) % (int) sizeof(playerChars);
             }
         }
 
