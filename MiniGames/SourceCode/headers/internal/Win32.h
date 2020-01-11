@@ -7,4 +7,6 @@ namespace platform
 
     bool WasKeyDown(int);
     bool IsKeyDown(int);
+
+    void WaitFor(double);
 }

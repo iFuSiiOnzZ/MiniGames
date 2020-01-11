@@ -107,6 +107,8 @@ int main(int argc, char *argv[])
     platformFunctions.WasKeyDown = &platform::WasKeyDown;
     platformFunctions.IsKeyDown = &platform::IsKeyDown;
 
+    platformFunctions.WaitFor = &platform::WaitFor;
+
     const char *menuHeader =
         "\n"
         "    ********************************************************************************\n"

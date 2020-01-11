@@ -9,5 +9,7 @@ namespace minigames
 
         bool(*WasKeyDown)(int key);
         bool(*IsKeyDown)(int key);
+
+        void(*WaitFor)(double milliseconds);
     } platform_t;
 }

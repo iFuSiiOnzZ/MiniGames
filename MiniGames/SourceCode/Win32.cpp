@@ -75,3 +75,28 @@ bool platform::WasKeyDown(int key)
     return (GetAsyncKeyState(key) & 0x0001) == 0x0001;
 }
 
+void platform::WaitFor(double milliseconds)
+{
+    LARGE_INTEGER Frequency = { 0 };
+    QueryPerformanceFrequency(&Frequency);
+
+    LARGE_INTEGER startTime = { 0 };
+    QueryPerformanceCounter(&startTime);
+
+    while (true)
+    {
+        _mm_pause();
+
+        LARGE_INTEGER currentTime = { 0 };
+        QueryPerformanceCounter(&currentTime);
+
+        LONGLONG llTimeDiff = currentTime.QuadPart - startTime.QuadPart;
+        double dftDuration = (double)llTimeDiff * 1000.0 / (double)Frequency.QuadPart;
+
+        if (dftDuration >= milliseconds)
+        {
+            break;
+        }
+    }
+}
+
