@@ -55,12 +55,12 @@ const char* toString(Direction direction)
     return "Undefined Direction";
 }
 
-extern "C" __declspec(dllexport) const char *GameName(void)
+EXPORT const char *GameName(void)
 {
     return "Snake";
 }
 
-extern "C" __declspec(dllexport) void StarGame(minigames::platform_t *platform)
+EXPORT void StarGame(minigames::platform_t *platform)
 {
     static const int ESCAPE = 27;
     Direction currentDirection = Direction::UP;

@@ -91,12 +91,12 @@ static bool fnc_is_board_full(const char board[3][3])
 
 ///////////////////////////////////////////////////////////////////////////////
 
-extern "C" __declspec(dllexport) const char *GameName(void)
+EXPORT const char *GameName(void)
 {
     return "Tic Tac Toe";
 }
 
-extern "C" __declspec(dllexport) void StarGame(minigames::platform_t *platform)
+EXPORT void StarGame(minigames::platform_t *platform)
 {
     const char boardFormat[] =
         "\n"
@@ -139,8 +139,12 @@ extern "C" __declspec(dllexport) void StarGame(minigames::platform_t *platform)
         }
 
         printf("    Select row and cold [player '%c'] (row,col): ", playerChars[whichChar]);
-        scanf_s("%d,%d", &row, &col);
 
+#if WIN32
+        fscanf_s(stdin, "%d,%d", &row, &col);
+#else
+        fscanf(stdin, "%d,%d", &row, &col);
+#endif
         if (row >= 1 && row <= 3 && col >= 1 && col <= 3)
         {
             if (matrix[row - 1][col - 1] == ' ')
