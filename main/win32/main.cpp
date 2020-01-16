@@ -2,14 +2,13 @@
 /*
     Project includes
 */
-#include "headers/internal/DLLHelper.h"
-#include "headers/internal/Win32.h"
-
-#include "headers/external/platform.h"
+#include "DLLHelper.h"
+#include "Win32.h"
 
 /*
     Lib includes
 */
+#include <platform.h>
 
 /*
     C/C++ includes
@@ -138,7 +137,7 @@ int main(int argc, char *argv[])
         }
         else if (userMenuOption <= games.size())
         {
-            games[userMenuOption - 1]->startGame(&platformFunctions);
+            games[userMenuOption - (int)1]->startGame(&platformFunctions);
         }
 
         platform::ClearScreen();

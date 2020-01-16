@@ -1,7 +1,7 @@
 /*
     Project includes
 */
-#include "headers/internal/Win32.h"
+#include "Win32.h"
 
 /*
     Lib includes
