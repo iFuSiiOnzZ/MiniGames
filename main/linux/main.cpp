@@ -1,6 +1,8 @@
 /*
     Project includes
 */
+#include "DLLHelper.h"
+#include "linux.h"
 
 /*
     Lib includes
@@ -16,7 +18,6 @@
 /*
     Platfrom includes
 */
-#include <dlfcn.h>
 
 /*
     Defines/Constants
@@ -33,18 +34,22 @@ typedef void(*StartGame)(minigames::platform_t *);
 int main(int argc, char *argv[])
 {
 
-    void *dllHandle = dlopen("./tictactoe.so", RTLD_NOW);
-    if(dllHandle == nullptr)
-    {
-        printf("%s\n", dlerror());
-        return EXIT_SUCCESS;
-    }
+    DLLHelper DllHelper("./tictactoe.so");
+    minigames::platform_t platformFunctions = { 0 };
 
-    GameName gameName = (GameName)dlsym(dllHandle, "GameName");
-    StartGame startGame = (StartGame)dlsym(dllHandle, "StarGame");
+    platformFunctions.ClearScreen = &platform::ClearScreen;
+    platformFunctions.FlushStdIn = &platform::FlushStdIn;
+
+    platformFunctions.WasKeyDown = &platform::WasKeyDown;
+    platformFunctions.IsKeyDown = &platform::IsKeyDown;
+
+    platformFunctions.WaitFor = &platform::WaitFor;
+
+
+    GameName gameName = DllHelper ["GameName"];
+    StartGame startGame = DllHelper["StarGame"];
 
     printf("%s\n", gameName());
-
-    dlclose(dllHandle);
+    startGame(&platformFunctions);
     return EXIT_SUCCESS;
 }
