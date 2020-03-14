@@ -1,23 +1,26 @@
 #!/bin/bash
+set +x
 
-if [ -d ../../output/linux ]; then
-    rm -rf ../../output/linux/*
+LOCAL_PATH="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
+
+if [ -d $LOCAL_PATH/../../output/linux ]; then
+    rm -rf $LOCAL_PATH/../../output/linux/*
 fi
 
-mkdir -p ../../output/linux
+mkdir -p $LOCAL_PATH/../../output/linux
 
 echo "Building snake game ..."
-    g++ -O0 -Wall -std=c++17 -rdynamic -fPIC -c -g -ggdb -I../../main/headers ../../snake/snake.cpp -o ../../output/linux/snake.o
-    g++ -shared -o ../../output/linux/snake.so ../../output/linux/snake.o
-    rm ../../output/linux/snake.o
+    g++ -O0 -Wall -std=c++17 -rdynamic -fPIC -c -g -ggdb -I$LOCAL_PATH/../../main/headers $LOCAL_PATH/../../snake/snake.cpp -o $LOCAL_PATH/../../output/linux/snake.o
+    g++ -shared -o $LOCAL_PATH/../../output/linux/snake.so $LOCAL_PATH/../../output/linux/snake.o
+    rm $LOCAL_PATH/../../output/linux/snake.o
 echo "Done"
 
 echo "Building tictactoe game ..."
-    g++ -O0 -Wall -std=c++17 -rdynamic -fPIC -c -g -ggdb -I../../main/headers ../../tictactoe/tictactoe.cpp -o ../../output/linux/tictactoe.o
-    g++ -shared -o ../../output/linux/tictactoe.so ../../output/linux/tictactoe.o
-    rm ../../output/linux/tictactoe.o
+    g++ -O0 -Wall -std=c++17 -rdynamic -fPIC -c -g -ggdb -I$LOCAL_PATH/../../main/headers $LOCAL_PATH/../../tictactoe/tictactoe.cpp -o $LOCAL_PATH/../../output/linux/tictactoe.o
+    g++ -shared -o $LOCAL_PATH/../../output/linux/tictactoe.so $LOCAL_PATH/../../output/linux/tictactoe.o
+    rm $LOCAL_PATH/../../output/linux/tictactoe.o
 echo "Done"
 
 echo "Building the executable ..."
-    g++ -O0 -Wall -std=c++17 -rdynamic -g -ggdb -I../../main/headers ../../main/linux/main.cpp ../../main/linux/linux.cpp -o ../../output/linux/MiniGames.a -ldl
+    g++ -O0 -Wall -std=c++17 -rdynamic -g -ggdb -I$LOCAL_PATH/../../main/headers $LOCAL_PATH/../../main/linux/main.cpp $LOCAL_PATH/../../main/linux/linux.cpp -o $LOCAL_PATH/../../output/linux/MiniGames.a -ldl
 echo "Done"
