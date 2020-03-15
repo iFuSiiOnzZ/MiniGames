@@ -67,10 +67,10 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static std::vector<std::string> fnc_get_all_dll(const char *path)
+static std::vector<std::string> fnc_get_all_dll(const std::string &path)
 {
     std::vector<std::string> names;
-    DIR* dirFile = opendir(path);
+    DIR *dirFile = opendir(path.c_str());
 
     if (!dirFile)
     {
@@ -104,9 +104,16 @@ static std::vector<std::shared_ptr<Game>> fnc_load_game(const std::vector<std::s
     return games;
 }
 
+static std::string fnc_getExecutionPath(const std::string &exePath)
+{
+    return exePath.substr(0, exePath.find_last_of('/') + 1);
+}
+
 int main(int argc, char *argv[])
 {
-    std::vector<std::shared_ptr<Game>> games(fnc_load_game(fnc_get_all_dll("./")));
+    std::string exePath(fnc_getExecutionPath(argv[0]));
+    std::vector<std::shared_ptr<Game>> games(fnc_load_game(fnc_get_all_dll(exePath)));
+
     minigames::platform_t platformFunctions = { 0 };
     size_t userMenuOption = 0;
 
@@ -120,7 +127,6 @@ int main(int argc, char *argv[])
 
     while (true)
     {
-        platform::FlushStdIn();
         platform::ClearScreen();
         platform::updateInput();
 
@@ -156,7 +162,7 @@ int main(int argc, char *argv[])
             else break;
         }
 
-        platform::WaitFor(10);
+        platform::WaitFor(50);
     }
 
     platform::ClearScreen();

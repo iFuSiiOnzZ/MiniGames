@@ -57,10 +57,10 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////////
 
-std::vector<std::string> fnc_get_all_dll(const char *path)
+static std::vector<std::string> fnc_get_all_dll(const std::string &path)
 {
     std::vector<std::string> names;
-    std::string search_path(std::string(path) + "/*.dll");
+    std::string search_path(path + "*.dll");
 
     WIN32_FIND_DATA fd;
     HANDLE hFind = ::FindFirstFileA(search_path.c_str(), &fd);
@@ -81,7 +81,7 @@ std::vector<std::string> fnc_get_all_dll(const char *path)
     return names;
 }
 
-std::vector<std::shared_ptr<Game>> fnc_load_game(const std::vector<std::string> &gameDlls)
+static std::vector<std::shared_ptr<Game>> fnc_load_game(const std::vector<std::string> &gameDlls)
 {
     std::vector<std::shared_ptr<Game>> games;
 
@@ -94,11 +94,18 @@ std::vector<std::shared_ptr<Game>> fnc_load_game(const std::vector<std::string> 
     return games;
 }
 
+static std::string fnc_getExecutionPath(const std::string &exePath)
+{
+    return exePath.substr(0, exePath.find_last_of('\\') + 1);
+}
+
 int main(int argc, char *argv[])
 {
-    std::vector<std::shared_ptr<Game>> games(fnc_load_game(fnc_get_all_dll("./")));
+    std::string exePath(fnc_getExecutionPath(argv[0]));
+    std::vector<std::shared_ptr<Game>> games(fnc_load_game(fnc_get_all_dll(exePath)));
+
     minigames::platform_t platformFunctions = { 0 };
-    int userMenuOption = 0;
+    size_t userMenuOption = 0;
 
     platformFunctions.ClearScreen = &platform::ClearScreen;
     platformFunctions.FlushStdIn = &platform::FlushStdIn;
@@ -108,40 +115,44 @@ int main(int argc, char *argv[])
 
     platformFunctions.WaitFor = &platform::WaitFor;
 
-    const char *menuHeader =
-        "\n"
-        "    ********************************************************************************\n"
-        "    *                                  Mini Games                                  *\n"
-        "    ********************************************************************************\n";
-
     while (true)
     {
-        printf("%s\n", menuHeader);
-        printf("        0 - Exit\n");
-
-        for (size_t i = 0; i < games.size(); ++i)
-        {
-            printf("        %zd - Play [%s]\n", i + 1, games[i]->gameName());
-        }
-
-        printf("\n        Select and option: ");
-        scanf_s("%d", &userMenuOption);
-
-        if (userMenuOption == 0)
-        {
-            break;
-        }
-        else if (userMenuOption < 0)
-        {
-            // NOTE(Andrei): Nothing to do, invalid input
-        }
-        else if (userMenuOption <= games.size())
-        {
-            games[userMenuOption - (int)1]->startGame(&platformFunctions);
-        }
-
-        platform::ClearScreen();
         platform::FlushStdIn();
+        platform::ClearScreen();
+
+        printf("\n");
+        printf("    ********************************************************************************\n");
+        printf("    *                                  Mini Games                                  *\n");
+        printf("    ********************************************************************************\n");
+
+        char c = (userMenuOption == 0) ? '>' : ' ';
+        printf("      %c Exit\n", c);
+
+        for (size_t i = 1; i < games.size() + 1; ++i)
+        {
+            char c = (i == userMenuOption) ? '>' : ' ';
+            printf("      %c Play [%s]\n", c, games[i - 1]->gameName());
+        }
+
+        if (platform::IsKeyDown(VK_UP))
+        {
+            if (userMenuOption == 0) userMenuOption = (int)games.size();
+            else --userMenuOption;
+        }
+
+        if (platform::IsKeyDown(VK_DOWN))
+        {
+            if (userMenuOption == games.size()) userMenuOption = 0;
+            else ++userMenuOption;
+        }
+
+        if (platform::IsKeyDown(VK_RETURN))
+        {
+            if (userMenuOption != 0) games[userMenuOption - 1]->startGame(&platformFunctions);
+            else break;
+        }
+
+        platform::WaitFor(50);
     }
 
     return 0;

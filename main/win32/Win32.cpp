@@ -61,8 +61,6 @@ void platform::ClearScreen()
 
 void platform::FlushStdIn()
 {
-    int c = 0;
-    while ((c = getchar()) != '\n' && c != EOF) {}
 }
 
 bool platform::IsKeyDown(int key)
