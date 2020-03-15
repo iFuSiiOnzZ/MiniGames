@@ -56,7 +56,10 @@ class DLLHelper
 
         ~DLLHelper()
         {
-            dlclose(m_hDLLModule);
+            if(m_hDLLModule)
+            {
+                dlclose(m_hDLLModule);
+            }
         }
 
         ProcPtr operator[](const char *fncName)
