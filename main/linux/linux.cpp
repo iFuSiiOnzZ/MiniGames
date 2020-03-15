@@ -12,14 +12,15 @@
     C/C++ includes
 */
 #include <sys/time.h>
+#include <sys/ioctl.h>
 #include <xmmintrin.h>
 
 #include <termios.h>
 #include <unistd.h>
-#include <fcntl.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
     Platfrom includes
@@ -30,8 +31,15 @@
 */
 
 /*
-    Enums/Strucsts
+    Enums/Structs
 */
+
+/*
+    Static variables
+*/
+
+static int gCurrentKeyDown[256] = { 0 };
+static int gLastKeyDown[256] = { 0 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -44,26 +52,21 @@ static double fnc_get_current_time_ms()
     return time_in_mill;
 }
 
-static int fnc_getPressedKey()
+static int fnc_kbhit()
 {
-    struct termios oldt = { 0 };
-    struct termios newt = { 0 };
+    struct termios term = { 0 };
+    tcgetattr(STDIN_FILENO, &term);
 
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
+    term.c_lflag &= ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL);
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
 
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    int byteswaiting = 0;
+    ioctl(STDIN_FILENO, FIONREAD, &byteswaiting);
 
-    int oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
-    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+    term.c_lflag |= (ICANON | ECHO | ECHOE | ECHOK | ECHONL);
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);
 
-    int ch = getchar();
-
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    fcntl(STDIN_FILENO, F_SETFL, oldf);
-
-    return ch;
+    return byteswaiting;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -76,18 +79,28 @@ void platform::ClearScreen()
 
 void platform::FlushStdIn()
 {
-    int c = 0;
-    while ((c = getchar()) != '\n' && c != EOF) {}
+}
+
+void platform::updateInput()
+{
+    memcpy(gLastKeyDown, gCurrentKeyDown, sizeof(gLastKeyDown));
+    memset(gCurrentKeyDown, 0, sizeof(gCurrentKeyDown));
+
+    for(int numChars = fnc_kbhit(); numChars > 0; --numChars)
+    {
+        int ch = getchar();
+        gCurrentKeyDown[ch] = 1;
+    }
 }
 
 bool platform::IsKeyDown(int key)
 {
-    return fnc_getPressedKey() == key;
+    return gCurrentKeyDown[key];
 }
 
 bool platform::WasKeyDown(int key)
 {
-    return false;
+    return gCurrentKeyDown[key] != 1 && gLastKeyDown[key] == 0;
 }
 
 void platform::WaitFor(double milliseconds)
